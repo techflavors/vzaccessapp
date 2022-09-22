@@ -12,7 +12,8 @@ const zettle_client_id = 'AXztLXOkAAsvAY6mSboxrwUF6pLE8dXPmSEOP8i-pn_kY8VmPDeU8C
 class TokenExchanger {
     init(app) {
         app.post("/exchange",(req,resp) => {
-            this.exchangeAuthCodeToToken(req, resp)
+            if(req.body.code) this.exchangeAuthCodeToTokenFromPPCode(req,resp);
+            else this.exchangeAuthCodeToToken(req, resp)
         });
     }
 
@@ -35,7 +36,6 @@ class TokenExchanger {
                     if(uatdata.statusCode != 200 || uatdata.data === null) {
                         this.sendError(resp,'Unable to get convert JWT to UAT', jwtdata, uatdata);
                     } else {
-                        // const uatdata = req.body
                         this.convertPPACToZAC(uatdata, (acdata) => {//7.
                             if(acdata.statusCode != 303 || acdata.izsessionat === null) {
                                 this.sendError(resp,'Unable to convert PP Auth Code to Z Auth Code',uatdata, acdata);
@@ -60,6 +60,34 @@ class TokenExchanger {
                 })
             }
         })
+    }
+
+    exchangeAuthCodeToTokenFromPPCode(req, resp) {
+        const uatdata = {
+            data: {
+                code: req.body.code
+            }
+        }
+        this.convertPPACToZAC(uatdata, (acdata) => {//7.
+            if(acdata.statusCode != 303 || acdata.izsessionat === null) {
+                this.sendError(resp,'Unable to convert PP Auth Code to Z Auth Code',uatdata, acdata);
+            } else {
+                this.convertZSessionToAC(acdata, (sessionacdata) => {//8.
+                    if(sessionacdata.statusCode != 302 || sessionacdata.zettleAuthCode === undefined) {
+                        this.sendError(resp,'Unable to convert Z Session to Z Auth Code',acdata, sessionacdata);
+                    } else {
+                        this.convertZACZAT(sessionacdata, (atdata) => {//9.
+                            if(atdata.statusCode != 200 || atdata.token === undefined) {
+                                this.sendError(resp,'Unable to convert Z Auth Code to Access Token',sessionacdata, atdata);
+                            }else {
+                                resp.send(atdata.token);
+                            }
+                        })
+                    }
+                })
+            }
+
+        });
     }
 
     notifyError(error, callback) {
@@ -125,12 +153,8 @@ class TokenExchanger {
     convertJWTToZUAT(jwtdata, callback){
         console.log("2. convertJWTToZUAT");
 
-        console.log(`AUTH = ${venmo_client_id+'   :   '+process.env.VCSECRET}`);
-
         let authHeader = Buffer.from(`${venmo_client_id+':'+process.env.VCSECRET}`).toString('base64');
-
-        console.log(authHeader);
-    
+  
         const options = {
             // hostname: "api.msmaster.qa.paypal.com",
             // hostname:"api.te-venmo-zettle-identity.qa.paypal.com",
