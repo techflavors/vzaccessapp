@@ -2,7 +2,6 @@ const { application } = require('express');
 const Cache = require('./Cache')
 const https = require('https')
 const url = require('url');
-const { threadId } = require('worker_threads');
 
 const venmo_sdk_client_id = '604f55ec-10a9-4463-a7cd-5976ec2f60fa'
 const venmo_client_id = 'AYxSef8wNXn6JNjjuiluQWN1F9qa2RHYnkx0aKqpPyZyFWTO6559hikB74xQCiswwU_UsYKEpjgr56qE'
@@ -12,7 +11,7 @@ const zettle_client_id = 'AXztLXOkAAsvAY6mSboxrwUF6pLE8dXPmSEOP8i-pn_kY8VmPDeU8C
 
 class TokenExchanger {
     init(app) {
-        app.get("/exchange",(req,resp) => {
+        app.post("/exchange",(req,resp) => {
             this.exchangeAuthCodeToToken(req, resp)
         });
     }
@@ -70,6 +69,15 @@ class TokenExchanger {
     }
 
     getJWTTokenForBusinessUser(orgreq, callback){
+    
+        callback({
+            statusCode: 200,
+            data: orgreq.body
+        });
+    }
+
+    //skipping this function since we cannot acess pikachu from heroku
+    getJWTTokenForBusinessUser_org(orgreq, callback){
         console.log("1. getJWTTokenForBusinessUser");
         const authHeader = orgreq.get('authorization')
         console.log(`Auth: ${authHeader}`);
