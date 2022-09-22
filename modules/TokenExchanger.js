@@ -12,7 +12,7 @@ const zettle_client_id = 'AXztLXOkAAsvAY6mSboxrwUF6pLE8dXPmSEOP8i-pn_kY8VmPDeU8C
 class TokenExchanger {
     init(app) {
         app.post("/exchange",(req,resp) => {
-            if(req.body.code) this.exchangeAuthCodeToTokenFromPPCode(req,resp);
+            if(req.body.subject_token) this.exchangeAuthCodeToTokenFromPPCode(req,resp);
             else this.exchangeAuthCodeToToken(req, resp)
         });
     }
@@ -65,7 +65,7 @@ class TokenExchanger {
     exchangeAuthCodeToTokenFromPPCode(req, resp) {
         const uatdata = {
             data: {
-                code: req.body.code
+                code: req.body.subject_token
             }
         }
         this.convertPPACToZAC(uatdata, (acdata) => {//7.
