@@ -69,7 +69,8 @@ class TokenExchanger {
     }
 
     getJWTTokenForBusinessUser(orgreq, callback){
-    
+        console.log(`${JSON.stringify(orgreq.body)}`);
+
         callback({
             statusCode: 200,
             data: orgreq.body
@@ -130,7 +131,8 @@ class TokenExchanger {
         console.log(authHeader);
     
         const options = {
-            hostname: "api.msmaster.qa.paypal.com",
+            // hostname: "api.msmaster.qa.paypal.com",
+            hostname:"api.te-venmo-zettle-identity.qa.paypal.com",
             port: "443",
             path: '/v1/oauth2/token',
             method: 'POST',
