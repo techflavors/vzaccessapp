@@ -27,14 +27,15 @@ class TokenExchanger {
     exchangeAuthCodeToToken(req, resp) {
         const queryObject = url.parse(req.url, true).query;
 
-        this.getJWTTokenForBusinessUser(req, (jwtdata) => { //4.
-            if(jwtdata.statusCode != 200 || jwtdata.data === null) {
-                this.sendError(resp,'Unable to get JWT Token for Business User',{}, jwtdata);
-            } else {
-                this.convertJWTToZUAT(jwtdata, (uatdata) => { //5.
-                    if(uatdata.statusCode != 200 || uatdata.data === null) {
-                        this.sendError(resp,'Unable to get convert JWT to UAT', jwtdata, uatdata);
-                    } else {
+        // this.getJWTTokenForBusinessUser(req, (jwtdata) => { //4.
+        //     if(jwtdata.statusCode != 200 || jwtdata.data === null) {
+        //         this.sendError(resp,'Unable to get JWT Token for Business User',{}, jwtdata);
+        //     } else {
+        //         this.convertJWTToZUAT(jwtdata, (uatdata) => { //5.
+        //             if(uatdata.statusCode != 200 || uatdata.data === null) {
+        //                 this.sendError(resp,'Unable to get convert JWT to UAT', jwtdata, uatdata);
+        //             } else {
+                        const uatdata = req.body
                         this.convertPPACToZAC(uatdata, (acdata) => {//7.
                             if(acdata.statusCode != 303 || acdata.izsessionat === null) {
                                 this.sendError(resp,'Unable to convert PP Auth Code to Z Auth Code',uatdata, acdata);
@@ -55,10 +56,10 @@ class TokenExchanger {
                             }
                 
                         });
-                    }
-                })
-            }
-        })
+            //         }
+            //     })
+            // }
+        // })
     }
 
     notifyError(error, callback) {
@@ -175,7 +176,8 @@ class TokenExchanger {
         const options = {
             hostname: "login.zettletest.com",
             port: "443",
-            path: `/oauth?code=${data.data.code}`,
+            // path: `/oauth?code=${data.data.code}`,
+            path: `/oauth?code=${data.code}`,
             method: 'GET',
         }
         const req = https.request(options, res => {
