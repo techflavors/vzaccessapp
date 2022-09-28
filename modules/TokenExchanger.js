@@ -3,15 +3,20 @@ const Cache = require('./Cache')
 const https = require('https')
 const url = require('url');
 
-const venmo_sdk_client_id = '604f55ec-10a9-4463-a7cd-5976ec2f60fa'
-const venmo_client_id = 'AYxSef8wNXn6JNjjuiluQWN1F9qa2RHYnkx0aKqpPyZyFWTO6559hikB74xQCiswwU_UsYKEpjgr56qE'
+let venmo_sdk_client_id = '604f55ec-10a9-4463-a7cd-5976ec2f60fa'
+let venmo_client_id = 'AYxSef8wNXn6JNjjuiluQWN1F9qa2RHYnkx0aKqpPyZyFWTO6559hikB74xQCiswwU_UsYKEpjgr56qE'
 const code_verifier = 'teFmHmCRhMjU2OEUgoBGqND-Onsxpl0Z2DwqU1MIx2YFKeg8GyfT5mq82a0rav-QzYLcAl3zUpk2IgEA0KXUkGYiuLtCtDRxJiGf8YZGBEgNUyDTbimAIOx2a.a7Y3u9'
 const venmo_redirect_uri = 'venmotest://login.callback'
-const zettle_client_id = 'AXztLXOkAAsvAY6mSboxrwUF6pLE8dXPmSEOP8i-pn_kY8VmPDeU8CrMEFg96cp3n1pVn6sjg3skGZMx'
+let zettle_client_id = 'AXztLXOkAAsvAY6mSboxrwUF6pLE8dXPmSEOP8i-pn_kY8VmPDeU8CrMEFg96cp3n1pVn6sjg3skGZMx'
 
 class TokenExchanger {
     init(app) {
         app.post("/exchange",(req,resp) => {
+
+            if(req.body.venmo_sdk_client_id) this.venmo_sdk_client_id = req.body.venmo_sdk_client_id;
+            if(req.body.venmo_client_id) this.venmo_client_id = req.body.venmo_client_id;
+            if(req.body.zettle_client_id) this.zettle_client_id = req.body.zettle_client_id;
+
             if(req.body.subject_token) this.exchangeAuthCodeToTokenFromPPCode(req,resp);
             else this.exchangeAuthCodeToToken(req, resp)
         });
