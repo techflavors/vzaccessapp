@@ -13,9 +13,13 @@ class TokenExchanger {
     init(app) {
         app.post("/exchange",(req,resp) => {
 
-            if(req.body.venmo_sdk_client_id) this.venmo_sdk_client_id = req.body.venmo_sdk_client_id;
-            if(req.body.venmo_client_id) this.venmo_client_id = req.body.venmo_client_id;
-            if(req.body.zettle_client_id) this.zettle_client_id = req.body.zettle_client_id;
+            if(req.body.venmo_sdk_client_id) venmo_sdk_client_id = req.body.venmo_sdk_client_id;
+            if(req.body.venmo_client_id) venmo_client_id = req.body.venmo_client_id;
+            if(req.body.zettle_client_id) zettle_client_id = req.body.zettle_client_id;
+
+            console.log(`Using venmo_sdk_client_id= ${venmo_sdk_client_id}`);
+            console.log(`Using venmo_client_id= ${venmo_client_id}`);
+            console.log(`Using zettle_client_id= ${zettle_client_id}`);
 
             if(req.body.subject_token) this.exchangeAuthCodeToTokenFromPPCode(req,resp);
             else this.exchangeAuthCodeToToken(req, resp)
@@ -247,6 +251,7 @@ class TokenExchanger {
 
     convertZSessionToAC(data, callback) {
         console.log("4. convertZSessionToAC");
+        console.log(`Using venmo_sdk_client_id= ${venmo_sdk_client_id}`);
         const options = {
             hostname: "oauth.zettletest.com",
             port: "443",
@@ -316,7 +321,7 @@ class TokenExchanger {
                 this.notifyError(error, callback);
             })
           });
-          
+          console.log(`Using venmo_sdk_client_id= ${venmo_sdk_client_id}`);
           var postData = `grant_type=authorization_code&code=${data.zettleAuthCode}&client_id=${venmo_sdk_client_id}&redirect_uri=${venmo_redirect_uri}&code_verifier=${code_verifier}`;
           
           req.write(postData);
