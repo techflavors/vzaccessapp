@@ -6,7 +6,7 @@ const url = require('url');
 let venmo_sdk_client_id = '604f55ec-10a9-4463-a7cd-5976ec2f60fa'
 let venmo_client_id = 'AYxSef8wNXn6JNjjuiluQWN1F9qa2RHYnkx0aKqpPyZyFWTO6559hikB74xQCiswwU_UsYKEpjgr56qE'
 const code_verifier = 'teFmHmCRhMjU2OEUgoBGqND-Onsxpl0Z2DwqU1MIx2YFKeg8GyfT5mq82a0rav-QzYLcAl3zUpk2IgEA0KXUkGYiuLtCtDRxJiGf8YZGBEgNUyDTbimAIOx2a.a7Y3u9'
-const venmo_redirect_uri = 'venmotest://login.callback'
+let venmo_redirect_uri = 'venmotest://login.callback'
 let zettle_client_id = 'AXztLXOkAAsvAY6mSboxrwUF6pLE8dXPmSEOP8i-pn_kY8VmPDeU8CrMEFg96cp3n1pVn6sjg3skGZMx'
 
 class TokenExchanger {
@@ -16,10 +16,12 @@ class TokenExchanger {
             if(req.body.venmo_sdk_client_id) venmo_sdk_client_id = req.body.venmo_sdk_client_id;
             if(req.body.venmo_client_id) venmo_client_id = req.body.venmo_client_id;
             if(req.body.zettle_client_id) zettle_client_id = req.body.zettle_client_id;
+            if(req.body.venmo_redirect_uri) venmo_redirect_uri = req.body.venmo_redirect_uri;
 
             console.log(`Using venmo_sdk_client_id= ${venmo_sdk_client_id}`);
             console.log(`Using venmo_client_id= ${venmo_client_id}`);
             console.log(`Using zettle_client_id= ${zettle_client_id}`);
+            console.log(`Using venmo_redirect_uri= ${venmo_redirect_uri}`);
 
             if(req.body.subject_token) this.exchangeAuthCodeToTokenFromPPCode(req,resp);
             else this.exchangeAuthCodeToToken(req, resp)
@@ -255,7 +257,7 @@ class TokenExchanger {
         const options = {
             hostname: "oauth.zettletest.com",
             port: "443",
-            path: `/authorize?app=payments-sdk&response_type=code&code_challenge_method=S256&locale=en_GB&client_id=${venmo_sdk_client_id}&scope=READ%3APAYMENT%20WRITE%3APAYMENT%20READ%3AUSERINFO&redirect_uri=venmotest%3A//login.callback&state=eyJjYWxsaW5nQWN0aXZpdHlDbGFzcyI6ImNvbS5pemV0dGxlLnBheW1lbnRzLmFuZHJvaWQua290bGluX3NhbXBsZS5NYWluQWN0aXZpdHkiLCJ0YXNrSWQiOiJlYTJkOGRlYS01NmE2LTQ5YjctYmQ5MC00MDA0Y2U1MmVjMmYiLCJ0YXNrVHlwZSI6ImNvbS5pemV0dGxlLmFuZHJvaWQuYXV0aC50YXNrcy5PQXV0aExvZ2luVGFzayJ9&code_challenge=A4b8iHgHarswQYxIezB2Ij5dLSYboX-Y-JmkQ1r82s0&isMobileApp=true&isSdkApp=true`,
+            path: `/authorize?app=payments-sdk&response_type=code&code_challenge_method=S256&locale=en_GB&client_id=${venmo_sdk_client_id}&scope=READ%3APAYMENT%20WRITE%3APAYMENT%20READ%3AUSERINFO&redirect_uri=${encodeURI(venmo_redirect_uri)}&state=eyJjYWxsaW5nQWN0aXZpdHlDbGFzcyI6ImNvbS5pemV0dGxlLnBheW1lbnRzLmFuZHJvaWQua290bGluX3NhbXBsZS5NYWluQWN0aXZpdHkiLCJ0YXNrSWQiOiJlYTJkOGRlYS01NmE2LTQ5YjctYmQ5MC00MDA0Y2U1MmVjMmYiLCJ0YXNrVHlwZSI6ImNvbS5pemV0dGxlLmFuZHJvaWQuYXV0aC50YXNrcy5PQXV0aExvZ2luVGFzayJ9&code_challenge=A4b8iHgHarswQYxIezB2Ij5dLSYboX-Y-JmkQ1r82s0&isMobileApp=true&isSdkApp=true`,
             method: 'GET',
             headers: {
                 'Cookie': `_izsessionat=${data.izsessionat}`
